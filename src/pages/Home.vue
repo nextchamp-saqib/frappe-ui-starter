@@ -1,39 +1,28 @@
 <template>
   <div class="max-w-3xl py-12 mx-auto">
-    <Button
-      icon-left="code"
-      @click="$resources.ping.fetch"
-      :loading="$resources.ping.loading"
-    >
+    <Button icon-left="code" @click="ping.fetch" :loading="ping.loading">
       Click to send 'ping' request
     </Button>
     <div>
-      {{ $resources.ping.data }}
+      {{ ping.data }}
     </div>
-    <pre>{{ $resources.ping }}</pre>
+    <pre>{{ ping }}</pre>
 
     <Button @click="showDialog = true">Open Dialog</Button>
-    <Dialog title="Title" v-model="showDialog"> Dialog content </Dialog>
+    <Dialog
+      v-model="showDialog"
+      :options="{
+        title: 'Dialog Title',
+      }"
+    />
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { Dialog } from 'frappe-ui'
+import { createResource } from 'frappe-ui'
+import { ref } from 'vue'
 
-export default {
-  name: 'Home',
-  data() {
-    return {
-      showDialog: false,
-    }
-  },
-  resources: {
-    ping: {
-      url: 'ping',
-    },
-  },
-  components: {
-    Dialog,
-  },
-}
+const showDialog = ref(false)
+const ping = createResource({ url: 'ping' })
 </script>

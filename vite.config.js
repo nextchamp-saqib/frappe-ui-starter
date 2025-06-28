@@ -1,27 +1,49 @@
-import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import frappeui from 'frappe-ui/vite'
 import path from 'path'
-import { getProxyOptions } from 'frappe-ui/src/utils/vite-dev-server'
-import { webserver_port } from '../../../sites/common_site_config.json'
+import { defineConfig } from 'vite'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  define: {
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
+  },
+  plugins: [
+    vue(),
+    frappeui({
+      frappeProxy: true,
+      lucideIcons: true,
+      jinjaBootData: true,
+      buildConfig: {
+        indexHtmlPath: `../${getAppName()}/www/${getAppName()}.html`,
+      },
+    }),
+  ],
   server: {
-    port: 8080,
-    proxy: getProxyOptions({ port: webserver_port }),
+    allowedHosts: true,
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      'tailwind.config.js': path.resolve(__dirname, 'tailwind.config.js'),
     },
   },
-  build: {
-    outDir: `../${path.basename(path.resolve('..'))}/public/frontend`,
-    emptyOutDir: true,
-    target: 'es2015',
-  },
   optimizeDeps: {
-    include: ['frappe-ui > feather-icons', 'showdown', 'engine.io-client'],
+    include: [
+      'frappe-ui > feather-icons',
+      'showdown',
+      'tailwind.config.js',
+      'engine.io-client',
+      'highlight.js/lib/core',
+    ],
   },
 })
+
+
+function getAppName() {
+  // frappe-ui projects are structured as follows:
+  // - apps
+  //   - <app_name>
+  //     - frontend
+  //       - vite.config.js
+  return path.basename(path.resolve(__dirname, '../..'))
+}
